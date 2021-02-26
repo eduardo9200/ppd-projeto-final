@@ -6,6 +6,14 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import net.jini.core.entry.UnusableEntryException;
+import net.jini.core.transaction.TransactionException;
+import net.jini.space.JavaSpace;
+import tuplas.Mensagem;
+import tuplas.Space;
+import tuplas.Usuario;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -15,10 +23,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.rmi.RemoteException;
 
 public class Chat extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	
+	private String nomeUsuario;
 	
 	private JPanel contentPane;
 	private JTextField textFieldMensagem;
@@ -32,7 +43,7 @@ public class Chat extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -43,12 +54,12 @@ public class Chat extends JFrame {
 				}
 			}
 		});
-	}
+	}*/
 
 	/**
 	 * Create the frame.
 	 */
-	public Chat() {
+	public Chat(String meuNome, String nomeUsuarioQueQueroConversar, JavaSpace space) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 350, 420);
 		contentPane = new JPanel();
@@ -58,6 +69,8 @@ public class Chat extends JFrame {
 		
 		initComponents();
 		initActions();
+		
+		buscaMensagensComUsuario(meuNome, nomeUsuarioQueQueroConversar, space);
 	}
 	
 	private void initComponents() {
@@ -111,5 +124,36 @@ public class Chat extends JFrame {
 		}
 		
 		textFieldMensagem.setText("");
+	}
+	
+	private void buscaMensagensComUsuario(String meuNome, String nomeOutro, JavaSpace space) {
+		Space template = new Space();
+		
+		Usuario eu = new Usuario();
+		eu.nome = meuNome;
+		
+		Usuario outro = new Usuario();
+		outro.nome = nomeOutro;
+		
+		Mensagem msg = new Mensagem();
+		msg.remetente = outro;
+		msg.destinatario = eu;
+		
+		template.mensagem = msg;
+		
+		boolean temMensagem = true;
+		
+		while(temMensagem) {
+			try {
+				Space result = (Space) space.take(template, null, 10_000);
+				
+				if(result == null)
+					temMensagem = false;
+				else
+					textArea.append(result.mensagem.mensagem + "\n");
+			} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
