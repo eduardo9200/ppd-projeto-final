@@ -10,8 +10,8 @@ import javax.swing.border.EmptyBorder;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
+import service.TuplaService;
 import tuplas.Mensagem;
-import tuplas.Space;
 import tuplas.Usuario;
 
 import javax.swing.JScrollPane;
@@ -25,11 +25,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
 
-public class Chat extends JFrame {
+public class Chat extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String nomeUsuario;
+	private JavaSpace space;
+	
+	private String meuNome;
+	private String nomeOutro;
 	
 	private JPanel contentPane;
 	private JTextField textFieldMensagem;
@@ -60,7 +63,7 @@ public class Chat extends JFrame {
 	 * Create the frame.
 	 */
 	public Chat(String meuNome, String nomeUsuarioQueQueroConversar, JavaSpace space) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 350, 420);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -69,8 +72,11 @@ public class Chat extends JFrame {
 		
 		initComponents();
 		initActions();
-		
-		buscaMensagensComUsuario(meuNome, nomeUsuarioQueQueroConversar, space);
+	
+		this.space = space;
+		this.meuNome = meuNome;
+		this.nomeOutro = nomeUsuarioQueQueroConversar;
+		this.lblNome.setText("Eu: " + meuNome + " >> " + nomeOutro);
 	}
 	
 	private void initComponents() {
@@ -92,10 +98,12 @@ public class Chat extends JFrame {
 		panel.add(scrollPane, BorderLayout.CENTER);
 		
 		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setLineWrap(true);
 		scrollPane.setViewportView(textArea);
 		
 		lblNome = new JLabel("");
-		lblNome.setBounds(10, 0, 120, 23);
+		lblNome.setBounds(10, 11, 314, 14);
 		contentPane.add(lblNome);
 	}
 	
@@ -117,43 +125,33 @@ public class Chat extends JFrame {
 	}
 	
 	private void enviaMensagem() {
-		String text = textFieldMensagem.getText();
+		String mensagem = textFieldMensagem.getText();
 		
-		if(text != null && !text.isEmpty() && !text.isBlank()) {
-			textArea.append(text + "\n");	
+		if(mensagem != null && !mensagem.isEmpty() && !mensagem.isBlank()) {
+			textArea.append("Eu: " + mensagem + "\n");
+			
+			try {
+				TuplaService.enviaMensagemParaEspiao(meuNome, nomeOutro, mensagem, space);
+			} catch (RemoteException | TransactionException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		textFieldMensagem.setText("");
 	}
-	
-	private void buscaMensagensComUsuario(String meuNome, String nomeOutro, JavaSpace space) {
-		Space template = new Space();
-		
-		Usuario eu = new Usuario();
-		eu.nome = meuNome;
-		
-		Usuario outro = new Usuario();
-		outro.nome = nomeOutro;
-		
-		Mensagem msg = new Mensagem();
-		msg.remetente = outro;
-		msg.destinatario = eu;
-		
-		template.mensagem = msg;
-		
-		boolean temMensagem = true;
-		
-		while(temMensagem) {
+
+	@Override
+	public void run() {
+		while(true) {
 			try {
-				Space result = (Space) space.take(template, null, 10_000);
+				Mensagem msg = TuplaService.buscaMensagem(nomeOutro, meuNome, space);
 				
-				if(result == null)
-					temMensagem = false;
-				else
-					textArea.append(result.mensagem.mensagem + "\n");
+				if(msg != null) {
+					this.textArea.append(nomeOutro + ": " + msg.mensagem + "\n");
+				}
 			} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 				e.printStackTrace();
-			}
+			}	
 		}
 	}
 }

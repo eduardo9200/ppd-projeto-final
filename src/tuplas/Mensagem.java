@@ -1,5 +1,7 @@
 package tuplas;
 
+import java.time.LocalDateTime;
+
 import net.jini.core.entry.Entry;
 
 public class Mensagem implements Entry {
@@ -9,6 +11,7 @@ public class Mensagem implements Entry {
 	public Usuario remetente;
 	public Usuario destinatario;
 	public String mensagem;
+	public LocalDateTime dataHora;
 	
 	public Mensagem() { }
 }

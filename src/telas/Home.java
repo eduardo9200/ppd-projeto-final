@@ -7,12 +7,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import mom.cliente.Chat;
 import net.jini.core.entry.UnusableEntryException;
-import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
-import tuplas.Space;
+
+import service.TuplaService;
 import tuplas.Usuario;
 
 import javax.swing.JScrollPane;
@@ -125,42 +124,28 @@ public class Home extends JFrame {
 			String nomeUsuarioQueQueroConversar = this.listUsuarios.getSelectedValue().toString();
 			Chat chat = new Chat(meuNomeUsuario, nomeUsuarioQueQueroConversar, this.space);
 			chat.setVisible(true);
+			new Thread(chat).start();
 		}
 	}
 	
 	private void btnAtualizarActionPerformed(ActionEvent e) {
-		List<String> usuarios = new ArrayList<String>();
-		Space template = new Space();
-		Usuario usuario = new Usuario();
-		template.usuario = usuario;
-		
-		boolean existeUsuario = true;
-		
 		try {
-			//Remove todos os usuários do espaço e armazena na lista denominada 'usuarios'
-			while(existeUsuario) {
-				Space result = (Space) space.take(template, null, 10_000);
-				if(result == null)
-					existeUsuario = false;
-				else
-					usuarios.add(result.usuario.nome);
-			}
-		
-			//Adiciona os nomes dos usuários na lista de usuários da Home
-			listUsuarios.setListData(usuarios.toArray(new String[usuarios.size()]));
-			
-			//Devolve os usuários removidos para o espaço
-			if(usuarios != null && !usuarios.isEmpty()) {
-				for(String nomeUsuario : usuarios) {
-					Space s = new Space();
-					Usuario u = new Usuario();
-					u.nome = nomeUsuario;
-					s.usuario = u;
-					space.write(s, null, Lease.FOREVER);
-				}
-			}
+			this.atualizarListaUsuarios();
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e1) {
 			e1.printStackTrace();
+		}
+	}
+	
+	private void atualizarListaUsuarios() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
+		List<String> nomesUsuarios = new ArrayList<String>();
+		
+		List<Usuario> usuarios = TuplaService.buscaTodosUsuarios(space);
+		
+		if(usuarios != null && !usuarios.isEmpty()) {
+			for(Usuario u : usuarios)
+				if(u.nome != meuNomeUsuario)
+					nomesUsuarios.add(u.nome);
+			listUsuarios.setListData(nomesUsuarios.toArray(new String[nomesUsuarios.size()]));
 		}
 	}
 }

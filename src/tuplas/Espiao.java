@@ -10,6 +10,8 @@ public class Espiao implements Entry {
 
 	private static final long serialVersionUID = 1L;
 	
+	public Mensagem mensagem;
+	
 	public List<String> palavrasSuspeitas;
 	
 	public Espiao() { }

@@ -5,12 +5,13 @@ import java.rmi.RemoteException;
 import javax.swing.JOptionPane;
 
 import net.jini.core.entry.UnusableEntryException;
-import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
+
+import service.TuplaService;
 import telas.Home;
 import telas.Info;
-import tuplas.Usuario;
+import telas.TelaEspiao;
 
 public class Main {
 	
@@ -43,8 +44,18 @@ public class Main {
 			infoFrame.setLblIdSpace("ID space: " + space);
 			System.out.println(space);
 			
-			String nomeUsuario = criaUsuario();
-			chamaTelaHome(nomeUsuario);
+			int option = JOptionPane.showConfirmDialog(null, "Entrar como Espião?", "Espião", JOptionPane.YES_NO_OPTION);
+			
+			if(option == -1) { //Clicou em Fechar
+				System.exit(0);				
+			} else if(option == 0) { //Clicou 'Sim'
+				chamaInterfaceEspiao();				
+			} else if(option == 1) { //Clicou 'Não'
+				String nomeUsuario = criaUsuario();
+				chamaTelaHome(nomeUsuario);				
+			} else {
+				throw new Exception("Opção Inválida");
+			}
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -67,21 +78,24 @@ public class Main {
 				JOptionPane.showMessageDialog(null, "Nome vazio. Digite um nome.");
 			
 			} else {
-				Usuario template = new Usuario();
-				template.nome = nomeUsuario;
+				nomeInvalido = !TuplaService.criaUsuario(nomeUsuario, space);
 				
-				Usuario usuario = (Usuario) space.read(template, null, 10_000);
-				
-				if(usuario == null) {
-					space.write(template, null, Lease.FOREVER);
-					nomeInvalido = false;
-
-				} else {
+				if(nomeInvalido)
 					JOptionPane.showMessageDialog(null, "Já existe um usuário chamado " + nomeUsuario + ". Digite outro nome.");
-				}
 			}
 		}
 		return nomeUsuario;
+	}
+	
+	private static void chamaInterfaceEspiao() {
+		try {
+			TelaEspiao espiao = new TelaEspiao(space);
+			espiao.setVisible(true);
+			new Thread(espiao).start();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void chamaTelaHome(String nomeUsuario) {
