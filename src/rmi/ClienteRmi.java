@@ -9,9 +9,9 @@ import tuplas.Mensagem;
 
 public class ClienteRmi {
 
-	public static void execute(Mensagem msg) {
+	public static void execute(Mensagem msg, String host, int port) {
 		try {
-			RmiInterface rmi = (RmiInterface) Naming.lookup("//localhost/SendMsgRef");
+			RmiInterface rmi = (RmiInterface) Naming.lookup("rmi://" + host + ":" + port + "/" + Registrador.REFERENCIA);
 			System.out.println("Objeto Localizado");
 			
 			rmi.sendMessageToTopic(msg);

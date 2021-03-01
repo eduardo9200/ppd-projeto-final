@@ -12,7 +12,6 @@ import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
 import service.TuplaService;
 import tuplas.Mensagem;
-import tuplas.Usuario;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;

@@ -10,6 +10,8 @@ import javax.swing.border.EmptyBorder;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
+import rmi.ClienteRmi;
+import rmi.Registrador;
 import service.TuplaService;
 import telas.models.InterceptacoesTableModel;
 import telas.models.PalavrasSuspeitasTableModel;
@@ -49,6 +51,9 @@ public class TelaEspiao extends JFrame implements Runnable {
 	private JLabel lblNewLabel_1;
 	private JLabel lblNewLabel_2;
 	
+	private String host;
+	private int port;
+	
 	private JavaSpace space;
 	private List<String> palavrasSuspeitas = new ArrayList<String>();
 	private InterceptacoesTableModel interceptacoesTableModel = new InterceptacoesTableModel();
@@ -74,7 +79,7 @@ public class TelaEspiao extends JFrame implements Runnable {
 	 * Create the frame.
 	 */
 	public TelaEspiao(JavaSpace space) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 600, 470);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -85,6 +90,29 @@ public class TelaEspiao extends JFrame implements Runnable {
 		this.initActions();
 		
 		this.space = space;
+	}
+	
+	public void registrarServidorRmi() {
+		String host = "";
+		String port = "";
+		
+		while(host.isEmpty() || host.isBlank())
+			host = JOptionPane.showInputDialog(this, "Informe um host para registrar o rmi. Ex.: localhost, 192.168.0.1, etc.");
+		
+		while(port.isEmpty() || port.isBlank())
+			port = JOptionPane.showInputDialog(this, "Informe uma porta para registrar o rmi, entre 0 e 65535.");
+		
+		if(host == null || port == null) {
+			JOptionPane.showMessageDialog(this, "Não será possível registrar o serviço do rmi (host e/ou porta = null). Abra novamente a tela do Espião para registrá-lo.");
+			return;
+		}
+		
+		int porta = Integer.parseInt(port);
+		
+		Registrador.registrarServidorRmi(porta);
+		
+		this.port = porta;
+		this.host = host;
 	}
 	
 	private void initComponents() {
@@ -155,14 +183,14 @@ public class TelaEspiao extends JFrame implements Runnable {
 				Espiao espiao = TuplaService.buscaMensagem(space);
 				
 				if(espiao != null) {
+					TuplaService.enviaMensagem(espiao.mensagem, space);
+					
 					String suspeitaEncontrada = buscaSuspeita(espiao.mensagem);
 					
 					if(suspeitaEncontrada != null) {
 						this.interceptacoesTableModel.addRow(espiao.mensagem, suspeitaEncontrada);
 						enviaParaBroker(espiao.mensagem);
 					}
-					
-					TuplaService.enviaMensagem(espiao.mensagem, space);
 				}
 			} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 				e.printStackTrace();
@@ -182,6 +210,6 @@ public class TelaEspiao extends JFrame implements Runnable {
 	}
 	
 	private void enviaParaBroker(Mensagem mensagem) {
-		//FIXME: implementar este método;
+		ClienteRmi.execute(mensagem, this.host, this.port);
 	}
 }

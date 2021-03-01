@@ -63,7 +63,7 @@ public class Home extends JFrame {
 	 * Create the frame.
 	 */
 	public Home(String meuNomeUsuario, JavaSpace space) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 250, 340);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -143,7 +143,7 @@ public class Home extends JFrame {
 		
 		if(usuarios != null && !usuarios.isEmpty()) {
 			for(Usuario u : usuarios)
-				if(u.nome != meuNomeUsuario)
+				if(!u.nome.equals(meuNomeUsuario))
 					nomesUsuarios.add(u.nome);
 			listUsuarios.setListData(nomesUsuarios.toArray(new String[nomesUsuarios.size()]));
 		}

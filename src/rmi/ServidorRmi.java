@@ -3,6 +3,7 @@ package rmi;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import midware.Publisher;
 import tuplas.Mensagem;
 
 public class ServidorRmi extends UnicastRemoteObject implements RmiInterface {
@@ -15,7 +16,16 @@ public class ServidorRmi extends UnicastRemoteObject implements RmiInterface {
 
 	@Override
 	public void sendMessageToTopic(Mensagem msg) throws RemoteException {
-		//FIXME: implementar este método;
+		String msgToTopic = this.geraMensagem(msg);
+		new Publisher(msgToTopic).execute();
 	}
 
+	private String geraMensagem(Mensagem msg) {
+		return new StringBuilder()
+			.append(msg.remetente.nome)
+			.append(" enviou para ")
+			.append(msg.destinatario.nome)
+			.append(" uma mensagem suspeita.")
+			.toString();
+	}
 }

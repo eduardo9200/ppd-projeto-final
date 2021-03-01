@@ -1,17 +1,11 @@
 package main;
 
-import java.rmi.RemoteException;
-
 import javax.swing.JOptionPane;
 
-import net.jini.core.entry.UnusableEntryException;
-import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace;
 
-import service.TuplaService;
-import telas.Home;
+import telas.Central;
 import telas.Info;
-import telas.TelaEspiao;
 
 public class Main {
 	
@@ -19,6 +13,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
+			JOptionPane.showMessageDialog(null, "Não esqueça de iniciar os serviços do Espaço de Tuplas e do ActiveMQ.");
 			instanciaEspacoTuplasEIniciaSistema();
 		
 		} catch (Exception e) {
@@ -44,65 +39,18 @@ public class Main {
 			infoFrame.setLblIdSpace("ID space: " + space);
 			System.out.println(space);
 			
-			int option = JOptionPane.showConfirmDialog(null, "Entrar como Espião?", "Espião", JOptionPane.YES_NO_OPTION);
-			
-			if(option == -1) { //Clicou em Fechar
-				System.exit(0);				
-			} else if(option == 0) { //Clicou 'Sim'
-				chamaInterfaceEspiao();				
-			} else if(option == 1) { //Clicou 'Não'
-				String nomeUsuario = criaUsuario();
-				chamaTelaHome(nomeUsuario);				
-			} else {
-				throw new Exception("Opção Inválida");
-			}
+			chamaTelaCentral(space);
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static String criaUsuario() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
-		String nomeUsuario = "";
-		boolean nomeInvalido = true;
-		
-		while(nomeInvalido) {
-			nomeUsuario = JOptionPane.showInputDialog(null, "Digite seu nome");
-			
-			//Clicou em cancelar
-			if(nomeUsuario == null) {
-				System.exit(0);
-			}
-			
-			if(nomeUsuario.isEmpty() || nomeUsuario.isBlank()) {
-				JOptionPane.showMessageDialog(null, "Nome vazio. Digite um nome.");
-			
-			} else {
-				nomeInvalido = !TuplaService.criaUsuario(nomeUsuario, space);
-				
-				if(nomeInvalido)
-					JOptionPane.showMessageDialog(null, "Já existe um usuário chamado " + nomeUsuario + ". Digite outro nome.");
-			}
-		}
-		return nomeUsuario;
-	}
-	
-	private static void chamaInterfaceEspiao() {
+	private static void chamaTelaCentral(JavaSpace space) {
 		try {
-			TelaEspiao espiao = new TelaEspiao(space);
-			espiao.setVisible(true);
-			new Thread(espiao).start();
+			Central central = new Central(space);
+			central.setVisible(true);
 			
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private static void chamaTelaHome(String nomeUsuario) {
-		try {
-			Home telaHome = new Home(nomeUsuario, space);
-			telaHome.setVisible(true);
-		
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
