@@ -117,6 +117,9 @@ public class Central extends JFrame {
 		});
 	}
 	
+	/*
+	 * Cria um novo usuário no espaço e chama a tela Home
+	 * */
 	private void btnNovoUsuarioActionPerformed(ActionEvent e) {
 		try {
 			String nomeUsuario = criaUsuario();
@@ -128,6 +131,9 @@ public class Central extends JFrame {
 		}
 	}
 	
+	/*
+	 * Chama a tela do mediador
+	 * */
 	private void btnMediadorActionPerformed(ActionEvent e) {
 		try {
 			Mediador mediador = new Mediador();
@@ -139,6 +145,9 @@ public class Central extends JFrame {
 		}
 	}
 	
+	/*
+	 * Chama a tela do espião 
+	 * */
 	private void btnEspiaoActionPerformed(ActionEvent e) {
 		try {
 			TelaEspiao espiao = new TelaEspiao(space);
@@ -151,6 +160,9 @@ public class Central extends JFrame {
 		}
 	}
 	
+	/*
+	 * Cria um usuário no espaço de tuplas
+	 * */
 	private String criaUsuario() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
 		String nomeUsuario = "";
 		boolean nomeInvalido = true;
@@ -163,10 +175,12 @@ public class Central extends JFrame {
 				System.exit(0);
 			}
 			
+			//Não digitou nada ou digitou apenas espaços em branco
 			if(nomeUsuario.isEmpty() || nomeUsuario.isBlank()) {
 				JOptionPane.showMessageDialog(null, "Nome vazio. Digite um nome.");
 			
 			} else {
+				//Tenta criar um usuário no espaço e verifica se a operação foi bem-sucedida
 				nomeInvalido = !TuplaService.criaUsuario(nomeUsuario, space);
 				
 				if(nomeInvalido)

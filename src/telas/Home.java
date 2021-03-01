@@ -119,6 +119,9 @@ public class Home extends JFrame {
 		});
 	}
 	
+	/*
+	 * Abre a conversa entre usuários em uma tela de chat, de acordo com o usuário selecionado na tela.
+	 * */
 	private void btnConversarActionPerformed(ActionEvent e) {
 		if(this.listUsuarios.getSelectedIndex() != -1) {
 			String nomeUsuarioQueQueroConversar = this.listUsuarios.getSelectedValue().toString();
@@ -128,6 +131,9 @@ public class Home extends JFrame {
 		}
 	}
 	
+	/*
+	 * Atualiza a lista de usuários existentes no espaço de tuplas.
+	 * */
 	private void btnAtualizarActionPerformed(ActionEvent e) {
 		try {
 			this.atualizarListaUsuarios();
@@ -136,15 +142,22 @@ public class Home extends JFrame {
 		}
 	}
 	
+	/*
+	 * Busca a lista de usuários existentes no espaço de tuplas para mostrar na tela do usuário.
+	 * */
 	private void atualizarListaUsuarios() throws RemoteException, UnusableEntryException, TransactionException, InterruptedException {
 		List<String> nomesUsuarios = new ArrayList<String>();
 		
+		//Busca todos os usuários no espaço.
 		List<Usuario> usuarios = TuplaService.buscaTodosUsuarios(space);
 		
+		//Mostra a lista de usuários no espaço, excluindo o próprio usuário.
 		if(usuarios != null && !usuarios.isEmpty()) {
 			for(Usuario u : usuarios)
 				if(!u.nome.equals(meuNomeUsuario))
 					nomesUsuarios.add(u.nome);
+			
+			//Mostra o resultado da busca na tela do usuário.
 			listUsuarios.setListData(nomesUsuarios.toArray(new String[nomesUsuarios.size()]));
 		}
 	}

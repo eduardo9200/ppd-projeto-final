@@ -21,6 +21,9 @@ public class Main {
 		}
 	}
 	
+	/*
+	 * Instancia o espaço de tuplas e starta o sistema, chamando o JFrame Central.java.
+	 * */
 	private static void instanciaEspacoTuplasEIniciaSistema() {
 		try {
 			Info infoFrame = new Info("Procurando pelo serviço JavaSpace...");
@@ -39,6 +42,7 @@ public class Main {
 			infoFrame.setLblIdSpace("ID space: " + space);
 			System.out.println(space);
 			
+			//Após encontrar o serviço do JavaSpace, o repassa para a tela Central e a inicia.
 			chamaTelaCentral(space);
 			
 		} catch(Exception e) {
@@ -46,6 +50,9 @@ public class Main {
 		}
 	}
 	
+	/*
+	 * Abre a tela Central para interação e uso do sistema.
+	 * */
 	private static void chamaTelaCentral(JavaSpace space) {
 		try {
 			Central central = new Central(space);

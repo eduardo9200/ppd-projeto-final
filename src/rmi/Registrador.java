@@ -13,6 +13,9 @@ public class Registrador {
 	
 	private static Registry registry;
 	
+	/*
+	 * Registra o serviço RMI/RPC
+	 * */
 	public static void registrarServidorRmi(int port) {
 		try {
 			ServidorRmi servidorRmi = new ServidorRmi();
@@ -21,7 +24,7 @@ public class Registrador {
 			registry = LocateRegistry.createRegistry(port);
 			registry.bind(REFERENCIA, servidorRmi);
 
-			System.out.println("Servidor registrado");
+			System.out.println("Servidor RMI/RPC registrado com sucesso");
 			
 		} catch (RemoteException | AlreadyBoundException e) {
 			e.printStackTrace();

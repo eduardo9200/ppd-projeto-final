@@ -9,8 +9,4 @@ public class Usuario implements Entry {
 	public String nome;
 	
 	public Usuario() { }
-	
-	public Usuario(String nome) {
-		this.nome = nome;
-	}
 }

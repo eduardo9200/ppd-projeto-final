@@ -92,6 +92,10 @@ public class TelaEspiao extends JFrame implements Runnable {
 		this.space = space;
 	}
 	
+	/*
+	 * Função para registrar o servidor RMI/RPC em um host e uma porta,
+	 * pois estava dando erro ao tentar fazer esse processo de modo automático.
+	 * */
 	public void registrarServidorRmi() {
 		String host = "";
 		String port = "";
@@ -168,6 +172,9 @@ public class TelaEspiao extends JFrame implements Runnable {
 		});
 	}
 	
+	/*
+	 * Adiciona uma palavra suspeita a ser buscada nas mensagens entre usuários.
+	 * */
 	private void btnAdicionarPalavraActionPerformed(ActionEvent e) {
 		String palavra = JOptionPane.showInputDialog(this, "Nova Palavra Suspeita");
 		if(palavra != null && !palavra.isEmpty() && !palavra.isBlank()) {
@@ -176,17 +183,26 @@ public class TelaEspiao extends JFrame implements Runnable {
 		}
 	}
 
+	/*
+	 * Thread utilizada para buscar mensagens enviadas para o espião para serem analisadas.
+	 * Após a análise, ela é devolvida para o espaço de tuplas para que seja recebida pelo destinatário.
+	 * Se a suspeita for identificada, então é registrada uma mensagem no tópico para que seja lida pelo mediador.
+	 * */
 	@Override
 	public void run() {
 		while(true) {
 			try {
+				//Busca a mensagem a ser lida pelo espião.
 				Espiao espiao = TuplaService.buscaMensagem(space);
 				
 				if(espiao != null) {
+					//Devolve a mensagem para o espaço, para ser recebida pelo destinatário.
 					TuplaService.enviaMensagem(espiao.mensagem, space);
 					
+					//Busca palavra suspeita.
 					String suspeitaEncontrada = buscaSuspeita(espiao.mensagem);
 					
+					//Se a suspeita existir, então ela é enviada ao broker para registá-la no tópico.
 					if(suspeitaEncontrada != null) {
 						this.interceptacoesTableModel.addRow(espiao.mensagem, suspeitaEncontrada);
 						enviaParaBroker(espiao.mensagem);
@@ -198,9 +214,15 @@ public class TelaEspiao extends JFrame implements Runnable {
 		}
 	}
 	
+	/*
+	 * Busca uma palavra suspeita em uma mensagem.
+	 * Percorre a lista de palavras suspeitas e, para cada uma, verifica se ela está contida na mensagem entre usuários.
+	 * Se estiver, retorna a palavra suspeita localizada. Caso contrário, retorna null. 
+	 * */
 	private String buscaSuspeita(Mensagem msg) {
 		String existeSuspeita = null;
 		
+		//Percorre a lista de palavras suspeitas e verifica se alguma delas está contida na mensagem.
 		if(this.palavrasSuspeitas != null && !this.palavrasSuspeitas.isEmpty())
 			for(String suspeita : palavrasSuspeitas)
 				if(msg.mensagem.contains(suspeita))
@@ -209,6 +231,9 @@ public class TelaEspiao extends JFrame implements Runnable {
 		return existeSuspeita;
 	}
 	
+	/*
+	 * Chama o método da interface RMI/RPC para enviar uma mensagem ao broker, que fará o registro no tópico e será lida pelo mediador.
+	 * */
 	private void enviaParaBroker(Mensagem mensagem) {
 		ClienteRmi.execute(mensagem, this.host, this.port);
 	}

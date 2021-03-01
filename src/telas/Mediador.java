@@ -98,10 +98,16 @@ public class Mediador extends JFrame {
 		this.dispose();
 	}
 	
+	/*
+	 * Inscreve o mediador no tópico. Função chamada pela Central.java.
+	 * */
 	public void inscreverMediadorNoTopico() {
 		new Subscriber(this).execute();
 	}
 	
+	/*
+	 * Adiciona a mensagem vinda do tópico na tela do mediador.
+	 * */
 	public void adicionarLinhaNaTabela(String texto) {
 		this.mediadorTableModel.addRow(texto);
 	}

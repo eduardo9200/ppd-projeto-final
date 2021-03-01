@@ -123,6 +123,10 @@ public class Chat extends JFrame implements Runnable {
 		});
 	}
 	
+	/*
+	 * Ao enviar uma mensagem para o usuário que estou conversando, na verdade,
+	 * ela é enviada para o espião, e o espião que envia para o destinatário.
+	 * */
 	private void enviaMensagem() {
 		String mensagem = textFieldMensagem.getText();
 		
@@ -130,6 +134,7 @@ public class Chat extends JFrame implements Runnable {
 			textArea.append("Eu: " + mensagem + "\n");
 			
 			try {
+				//Envia a mensagem para o espião
 				TuplaService.enviaMensagemParaEspiao(meuNome, nomeOutro, mensagem, space);
 			} catch (RemoteException | TransactionException e) {
 				e.printStackTrace();
@@ -139,6 +144,10 @@ public class Chat extends JFrame implements Runnable {
 		textFieldMensagem.setText("");
 	}
 
+	/*
+	 * Thread utilizada para conversa entre usuários.
+	 * Ela busca mensagens no espaço, levando em conta quem é o remetente e o destinatário, e a mostra na tela do chat.
+	 * */
 	@Override
 	public void run() {
 		while(true) {

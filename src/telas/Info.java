@@ -11,6 +11,9 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+/*
+ * Tela para notificações, sendo utilizada somente para mostrar o status do serviço do JavaSpace.
+ * */
 public class Info extends JFrame {
 
 	private static final long serialVersionUID = 1L;
