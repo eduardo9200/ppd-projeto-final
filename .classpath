@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-15">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-15"/>
 	<classpathentry kind="lib" path="C:/Users/eduardo.maia/Desktop/ApacheRiver.zip (Unzipped Files)-20210111T150309Z-001/ApacheRiver.zip (Unzipped Files)/river/lib-ext/jsk-policy.jar"/>
 	<classpathentry kind="lib" path="C:/Users/eduardo.maia/Desktop/ApacheRiver.zip (Unzipped Files)-20210111T150309Z-001/ApacheRiver.zip (Unzipped Files)/river/lib-dl/browser-dl.jar"/>
 	<classpathentry kind="lib" path="C:/Users/eduardo.maia/Desktop/ApacheRiver.zip (Unzipped Files)-20210111T150309Z-001/ApacheRiver.zip (Unzipped Files)/river/lib-dl/fiddler-dl.jar"/>
